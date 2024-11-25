@@ -39,15 +39,12 @@ driver = webdriver.Chrome(service=service, options=options)
 try:
     url = 'https://www.avito.ru/moskva/noutbuki/igrovoy_noutbuk_thunderobot_i5_i7_rtx_4050_4060_3897056856'
     driver.get(url)
-    time.sleep(2)
-
+    
     # Время для входа в личный кабинет
-    WebDriverWait(driver, 120).until(
-        EC.invisibility_of_element_located((By.CSS_SELECTOR, '[data-marker="header/login-button"]'))
-    )
-
-    button = None
+    time.sleep(60)
+    
     # Кнопка Купить с доставкой
+    button = None
     while not button:
         try:
             button = driver.find_element(By.CSS_SELECTOR, 'button[data-marker="delivery-item-button-main"]')
@@ -62,7 +59,7 @@ try:
 
     if price < 55000:
         button.click()
-        time.sleep(1)
+        time.sleep(1.5)
         driver.execute_script("window.stop();")
 
         # Кнопка Оплатить
@@ -88,7 +85,7 @@ try:
             except Exception: None
 
 
-        #Кнока Оплатить СУММА
+        # Кнока Оплатить СУММА
         button = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, 'button[data-marker="payButton"]'))
         )
@@ -101,7 +98,7 @@ try:
                 
         code = get_code()
         driver.execute_script("window.stop();")
-        #Вставка кода
+        # Вставка кода
         
         # # СБЕР
         # password_input = WebDriverWait(driver, 10).until(
