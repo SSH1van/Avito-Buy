@@ -39,23 +39,31 @@ driver = webdriver.Chrome(service=service, options=options)
 try:
     url = 'https://www.avito.ru/moskva/noutbuki/igrovoy_noutbuk_thunderobot_i5_i7_rtx_4050_4060_3897056856'
     driver.get(url)
+    time.sleep(2)
 
     # Время для входа в личный кабинет
-    time.sleep(60)
-    price = int(driver.find_element(By.CSS_SELECTOR, 'span[data-marker="item-view/item-price"]').text.replace("₽", "").replace(" ", ""))
-    
+    WebDriverWait(driver, 120).until(
+        EC.invisibility_of_element_located((By.CSS_SELECTOR, '[data-marker="header/login-button"]'))
+    )
+
     button = None
     # Кнопка Купить с доставкой
     while not button:
         try:
             button = driver.find_element(By.CSS_SELECTOR, 'button[data-marker="delivery-item-button-main"]')
+            price_element = driver.find_element(By.CSS_SELECTOR, "span[itemprop='price']")
+            price_content = price_element .get_attribute("content")
+            price = int(price_content)
         except Exception: 
             button = None
             driver.refresh()
-            time.sleep(random.uniform(0.5, 5))
+            time.sleep(random.uniform(0.5, 2))
+            driver.execute_script("window.stop();")
 
-    if price < 60000:
+    if price < 55000:
         button.click()
+        time.sleep(1)
+        driver.execute_script("window.stop();")
 
         # Кнопка Оплатить
         button = WebDriverWait(driver, 10).until(
@@ -80,7 +88,7 @@ try:
             except Exception: None
 
 
-        # Кнока Оплатить СУММА
+        #Кнока Оплатить СУММА
         button = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, 'button[data-marker="payButton"]'))
         )
@@ -91,17 +99,30 @@ try:
                     break
             except Exception: None
                 
-
-        # Вставка кода в passwordEdit
         code = get_code()
+        driver.execute_script("window.stop();")
+        #Вставка кода
+        
+        # # СБЕР
+        # password_input = WebDriverWait(driver, 10).until(
+        #     EC.presence_of_element_located((By.ID, "passwordEdit"))
+        # )
+        # while True:
+        #     try:
+        #         password_input.send_keys(code)
+        #         break
+        #     except Exception:
+        #         password_input = driver.find_element(By.ID, "passwordEdit")
+
+        # ВТБ
         password_input = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "passwordEdit"))
+            EC.presence_of_element_located((By.ID, "psw_id"))
         )
-        while True:
-            try:
-                password_input.send_keys(code)
-                break
-            except Exception:
-                password_input = driver.find_element(By.ID, "passwordEdit")
+        password_input.send_keys(code)
+        password_button = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "btnSubmit"))
+        )
+        password_button.click() 
 finally:
+    time.sleep(120)
     driver.quit()

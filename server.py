@@ -26,8 +26,10 @@ def check_auth(auth_header):
         return False
 
 def get_part_message(data):
-    pattern = r"\d{4}"
+    pattern = r"(?<!\S)\d{4}(?!\S)"
     match = re.search(pattern, data)
+    if not match:
+        return jsonify({"error": "Invalid input"}), 401
     return match.group()
 
 @app.route("/", methods=["POST"])
